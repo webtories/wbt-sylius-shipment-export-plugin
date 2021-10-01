@@ -1,16 +1,16 @@
 <p align="center">
     <a href="https://www.mangoweb.cz/en/" target="_blank">
-        <img src="https://avatars0.githubusercontent.com/u/38423357?s=200&v=4"/>
+        <img src="https://3brs1.fra1.cdn.digitaloceanspaces.com/3brs/logo/3BRS-logo-sylius-200.png"/>
     </a>
 </p>
 <h1 align="center">
 Shipment Export Plugin
 <br />
-    <a href="https://packagist.org/packages/mangoweb-sylius/sylius-shipment-export-plugin" title="License" target="_blank">
-        <img src="https://img.shields.io/packagist/l/mangoweb-sylius/sylius-shipment-export-plugin.svg" />
+	<a href="https://packagist.org/packages/3brs/sylius-shipment-export-plugin" title="License" target="_blank">
+        <img src="https://img.shields.io/packagist/l/3brs/sylius-shipment-export-plugin" />
     </a>
-    <a href="https://packagist.org/packages/mangoweb-sylius/sylius-shipment-export-plugin" title="Version" target="_blank">
-        <img src="https://img.shields.io/packagist/v/mangoweb-sylius/sylius-shipment-export-plugin.svg" />
+    <a href="https://packagist.org/packages/3brs/sylius-shipment-export-plugin" title="Version" target="_blank">
+        <img src="https://img.shields.io/packagist/v/3brs/sylius-shipment-export-plugin" />
     </a>
     <a href="http://travis-ci.org/mangoweb-sylius/SyliusShipmentExportPlugin" title="Build status" target="_blank">
         <img src="https://img.shields.io/travis/mangoweb-sylius/SyliusShipmentExportPlugin/master.svg" />
@@ -27,12 +27,12 @@ Shipment Export Plugin
 
 
 <p align="center">
-	<img src="https://raw.githubusercontent.com/mangoweb-sylius/SyliusShipmentExportPlugin/master/doc/menu.png"/>
+	<img src="https://raw.githubusercontent.com/3BRS/sylius-shipment-export-plugin/master/doc/menu.png"/>
 </p>
 
 
 <p align="center">
-	<img src="https://raw.githubusercontent.com/mangoweb-sylius/SyliusShipmentExportPlugin/master/doc/list.png"/>
+	<img src="https://raw.githubusercontent.com/3BRS/sylius-shipment-export-plugin/master/doc/list.png"/>
 </p>
 
 ## Installation
@@ -104,4 +104,5 @@ This library is under the MIT license.
 
 Credits
 -------
-Developed by [manGoweb](https://www.mangoweb.eu/).
+Developed by [3BRS](https://3brs.com)<br>
+Forked from [manGoweb](https://github.com/mangoweb-sylius/SyliusShipmentExportPlugin).

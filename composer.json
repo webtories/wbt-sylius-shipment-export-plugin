@@ -1,5 +1,5 @@
 {
-	"name": "mangoweb-sylius/sylius-shipment-export-plugin",
+	"name": "3brs/sylius-shipment-export-plugin",
 	"type": "sylius-plugin",
 	"description": "Shipping export plugin for Sylius",
 	"license": "MIT",
