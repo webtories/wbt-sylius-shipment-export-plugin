@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace ThreeBRS\SyliusShipmentExportPlugin\Controller;
 
-use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use SM\Factory\FactoryInterface;
 use Sylius\Component\Core\Model\PaymentInterface;
 use Sylius\Component\Core\Model\ShipmentInterface;
@@ -13,7 +12,6 @@ use Sylius\Component\Core\Repository\ShipmentRepositoryInterface;
 use Sylius\Component\Shipping\ShipmentTransitions;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\EventDispatcher\GenericEvent;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -32,7 +30,7 @@ class ShipmentExportController
     /** @var Environment */
     private $templatingEngine;
 
-    /** @var EntityManager */
+    /** @var EntityManagerInterface  */
     private $entityManager;
 
     /** @var FlashBagInterface */
@@ -57,90 +55,88 @@ class ShipmentExportController
     private $translator;
 
     public function __construct(
-        Environment $templatingEngine,
-        EntityManager $entityManager,
-        FlashBagInterface $flashBag,
-        FactoryInterface $stateMachineFatory,
-        EventDispatcherInterface $eventDispatcher,
-        RouterInterface $router,
-        ShipmentExporterInterface $shipmentExporter,
-        ParameterBagInterface $parameterBag,
-        ShipmentRepositoryInterface $shipmentRepository,
-        TranslatorInterface $translator
+		Environment $templatingEngine,
+		EntityManagerInterface $entityManager,
+		FlashBagInterface $flashBag,
+		FactoryInterface $stateMachineFatory,
+		EventDispatcherInterface $eventDispatcher,
+		RouterInterface $router,
+		ShipmentExporterInterface $shipmentExporter,
+		ParameterBagInterface $parameterBag,
+		ShipmentRepositoryInterface $shipmentRepository,
+		TranslatorInterface $translator
     ) {
-        $this->templatingEngine = $templatingEngine;
-        $this->entityManager = $entityManager;
-        $this->flashBag = $flashBag;
-        $this->stateMachineFatory = $stateMachineFatory;
-        $this->eventDispatcher = $eventDispatcher;
-        $this->router = $router;
-        $this->shipmentExporter = $shipmentExporter;
-        $this->parameterBag = $parameterBag;
-        $this->shipmentRepository = $shipmentRepository;
-        $this->translator = $translator;
+		$this->templatingEngine = $templatingEngine;
+		$this->entityManager = $entityManager;
+		$this->flashBag = $flashBag;
+		$this->stateMachineFatory = $stateMachineFatory;
+		$this->eventDispatcher = $eventDispatcher;
+		$this->router = $router;
+		$this->shipmentExporter = $shipmentExporter;
+		$this->parameterBag = $parameterBag;
+		$this->shipmentRepository = $shipmentRepository;
+		$this->translator = $translator;
     }
 
-    public function showAllUnshipShipments(string $exporterName): Response
-    {
-        $shippingCodes = $this->shipmentExporter->getShippingMethodsCodes();
-        $shipments = $this->getReadyShipments($shippingCodes);
+	public function showAllUnshipShipments(string $exporterName): Response
+	{
+		$shippingCodes = $this->shipmentExporter->getShippingMethodsCodes();
+		$shipments = $this->getReadyShipments($shippingCodes);
 
-        return new Response(
-            $this->templatingEngine->render(
-                '@ThreeBRSSyliusShipmentExportPlugin/index.html.twig',
-                [
-                    'shipments' => $shipments,
-                    'exporterName' => $exporterName,
-                    'exporter' => $this->shipmentExporter,
-                    'exporterLabel' => $this->getExporterLabel($exporterName),
-                ]
-            )
-        );
-    }
+		return new Response(
+			$this->templatingEngine->render(
+				'@ThreeBRSSyliusShipmentExportPlugin/index.html.twig',
+				[
+					'shipments' => $shipments,
+					'exporterName' => $exporterName,
+					'exporter' => $this->shipmentExporter,
+					'exporterLabel' => $this->getExporterLabel($exporterName),
+				]
+			)
+		);
+	}
 
-    public function exportShipmentsAction(Request $request, string $exporterName): StreamedResponse
-    {
-        $ids = $request->get('ids', []);
-        $shipments = $this->getShipmentsByIds($ids);
-        $questionsArray = $request->get('questions', []);
+	public function exportShipmentsAction(Request $request, string $exporterName): StreamedResponse
+	{
+		$ids = $request->get('ids', []);
+		$shipments = $this->getShipmentsByIds($ids);
+		$questionsArray = $request->get('questions', []);
 
-        return $this->doCsvFile($shipments, $exporterName, $questionsArray);
-    }
+		return $this->doCsvFile($shipments, $exporterName, $questionsArray);
+	}
 
-    public function markAsSend(Request $request, string $exporterName): RedirectResponse
-    {
-        $ids = $request->get('ids', []);
-        $shipments = $this->getShipmentsByIds($ids);
+	public function markAsSend(Request $request, string $exporterName): RedirectResponse
+	{
+		$ids = $request->get('ids', []);
+		$shipments = $this->getShipmentsByIds($ids);
 
-        foreach ($shipments as $shipment) {
-            assert($shipment instanceof ShipmentInterface);
+		foreach ($shipments as $shipment) {
+			$this->shipShipment($shipment);
+		}
+		$this->entityManager->flush();
 
-            $this->shipShipment($shipment);
-        }
-        $this->entityManager->flush();
+		foreach ($shipments as $shipment) {
+			$this->dispatchEvent('sylius.shipment.post_ship', $shipment);
+		}
 
-        foreach ($shipments as $shipment) {
-            assert($shipment instanceof ShipmentInterface);
+		$message = $this->translator->trans('threebrs.ui.shippingExport.exportAndShipSuccess', ['{{ count }}' => count($shipments)]);
+		$this->flashBag->add('success', $message);
 
-            $this->dispatchEvent('sylius.shipment.post_ship', $shipment);
-        }
+		$url = $this->router->generate('threebrs_admin_Shipment_export', ['exporterName' => $exporterName]);
 
-        $message = $this->translator->trans('threebrs.ui.shippingExport.exportAndShipSuccess', ['{{ count }}' => count($shipments)]);
-        $this->flashBag->add('success', $message);
+		return new RedirectResponse($url);
+	}
 
-        $url = $this->router->generate('threebrs_admin_Shipment_export', ['exporterName' => $exporterName]);
 
-        return new RedirectResponse($url);
-    }
+	public function getExporterLabel(string $exporterCode): string
+	{
+		$exporters = $this->parameterBag->get('threebrs.shipment_exporters');
 
-    public function getExporterLabel(string $exporterCode): string
-    {
-        $exporters = $this->parameterBag->get('threebrs.shipment_exporters');
+		return array_key_exists($exporterCode, $exporters) ? $exporters[$exporterCode] : '';
+	}
 
-        return array_key_exists($exporterCode, $exporters) ? $exporters[$exporterCode] : '';
-    }
 
-    public function getShipmentsByIds(array $ids): array
+	public function getShipmentsByIds(array $ids): array
     {
         /** @var EntityRepository $shipmentRepository */
         $shipmentRepository = $this->shipmentRepository;
