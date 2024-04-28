@@ -11,6 +11,7 @@ use Sylius\Component\Core\Model\PaymentInterface;
 use Sylius\Component\Core\Model\ShipmentInterface;
 use Sylius\Component\Core\Repository\ShipmentRepositoryInterface;
 use Sylius\Component\Shipping\ShipmentTransitions;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\GenericEvent;
@@ -24,7 +25,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 use ThreeBRS\SyliusShipmentExportPlugin\Model\ShipmentExporterInterface;
 use Twig\Environment;
 
-class ShipmentExportController
+class ShipmentExportController extends AbstractController
 {
     /** @var ParameterBagInterface */
     private $parameterBag;
