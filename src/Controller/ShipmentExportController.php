@@ -59,6 +59,7 @@ class ShipmentExportController
     public function __construct(
         Environment $templatingEngine,
         EntityManager $entityManager,
+        FlashBagInterface $flashBag,
         FactoryInterface $stateMachineFatory,
         EventDispatcherInterface $eventDispatcher,
         RouterInterface $router,
@@ -69,6 +70,7 @@ class ShipmentExportController
     ) {
         $this->templatingEngine = $templatingEngine;
         $this->entityManager = $entityManager;
+        $this->flashBag = $flashBag;
         $this->stateMachineFatory = $stateMachineFatory;
         $this->eventDispatcher = $eventDispatcher;
         $this->router = $router;
