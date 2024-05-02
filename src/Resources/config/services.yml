@@ -18,7 +18,7 @@ services:
             $parameterBag: '@parameter_bag'
             $templatingEngine: '@twig'
             $entityManager: '@doctrine.orm.default_entity_manager'
-            $flashBag: '@session_listener'
+            $flashBag: '@session.flash_bag'
             $stateMachineFatory: '@sm.factory'
             $eventDispatcher: '@event_dispatcher'
             $router: '@router'
