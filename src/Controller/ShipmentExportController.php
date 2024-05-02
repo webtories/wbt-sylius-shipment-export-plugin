@@ -22,7 +22,6 @@ use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use ThreeBRS\SyliusShipmentExportPlugin\Model\ShipmentExporterInterface;
 use Twig\Environment;
 
@@ -57,9 +56,6 @@ class ShipmentExportController extends AbstractController
 
     /** @var TranslatorInterface */
     private $translator;
-	/** @var ContainerInterface */
-	private $container;
-
 
     public function __construct(
         Environment $templatingEngine,
@@ -236,8 +232,4 @@ class ShipmentExportController extends AbstractController
 
         return $response;
     }
-	public function setContainer(ContainerInterface $container)
-	{
-		$this->container = $container;
-	}
 }
