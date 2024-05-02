@@ -25,7 +25,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 use ThreeBRS\SyliusShipmentExportPlugin\Model\ShipmentExporterInterface;
 use Twig\Environment;
 
-class ShipmentExportController extends AbstractController
+class ShipmentExportController
 {
     /** @var ParameterBagInterface */
     private $parameterBag;
